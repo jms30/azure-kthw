@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 wget --timestamping \
   "https://github.com/etcd-io/etcd/releases/download/v3.3.20/etcd-v3.3.20-linux-amd64.tar.gz"
 

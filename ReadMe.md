@@ -34,7 +34,7 @@ This guide facilitates creation of Kubernetes Cluster on Azure Cloud. Please use
 	* 05_configuration.sh
 	* 10_kubectl_access.sh
 	
-10. On each VM, create two folders in home directory as *kubernetes_setup_files* and *scripts*.
+10. On each VM, create two folders in home directory as *kubernetes_setup_files* (used to store all kubernetes related files) and *scripts* (used to copy relevant bash scripts from this project to run later). 
 
 11. Following are the defined IP ranges for different purposes.
 	* Service Cluster IP range: **10.32.0.0/24**

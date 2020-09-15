@@ -1,4 +1,4 @@
-CONTROLLER_PUBLIC_ADDRESS=()###ADD SPACE SEPARATED IP ADDRESS OF YOUR AZURE CONTROLLER VM
+CONTROLLER_PUBLIC_ADDRESS=()                            ###ADD SPACE SEPARATED IP ADDRESS OF YOUR AZURE CONTROLLER VM
 
 for instance in ${CONTROLLER_PUBLIC_ADDRESS[@]}; do
         echo ${instance}
@@ -6,7 +6,7 @@ for instance in ${CONTROLLER_PUBLIC_ADDRESS[@]}; do
 	scp 07_etcd.sh 08_control_plane.sh cleanup_master.sh escrypt@${instance}:~/scripts
 done
 
-WORKER_PUBLIC_ADDRESS=()###ADD SPACE SEPARATED IP ADDRESS OF YOUR AZURE WORKER VM
+WORKER_PUBLIC_ADDRESS=()                                ###ADD SPACE SEPARATED IP ADDRESS OF YOUR AZURE WORKER VM
 
 for instance in {1..3}; do
         echo ${WORKER_PUBLIC_ADDRESS[${instance}-1]}

@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 wget --timestamping \
   https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.17.0/crictl-v1.17.0-linux-amd64.tar.gz \
   https://storage.googleapis.com/gvisor/releases/nightly/latest/runsc \

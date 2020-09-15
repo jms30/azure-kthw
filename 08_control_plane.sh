@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 CONFIG_FILE_DIRECTORY=../kubernetes_setup_files
 
 sudo mkdir -p /etc/kubernetes/config
@@ -68,7 +70,6 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 EOF
-
 
 ####################################################################################
 

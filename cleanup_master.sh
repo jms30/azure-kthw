@@ -25,4 +25,4 @@ sudo rm -r -f /usr/local/bin/kube-apiserver
 sudo rm -r -f /usr/local/bin/kube-controller-manager
 sudo rm -r -f /usr/local/bin/kube-scheduler
 
-echo -e "Cleaned Up everything on Master"
+echo -e "Cleaned Up Master -> Done"

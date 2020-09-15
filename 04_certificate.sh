@@ -1,3 +1,17 @@
+#!/usr/bin/env bash
+
+####################################### CONFIGURATION PARAMETERS #######################################
+
+COUNTRY_CODE="CA"
+LOCATION="Waterloo"
+ORG="CA"
+ORG_UNIT="Kubernetes The Hard Way"
+STATE="Ontario"
+KEY_ALGO="rsa"
+KEY_SIZE=2048
+WORKER_EXTERNAL_IP=(8.8.8.8)                ####### PROVIDE YOUR WORKER'S EXTERNAL IP HERE.
+KUBERNETES_PUBLIC_ADDRESS=8.8.8.8           ####### PROVIDE YOUR AZURE LOAD BALANCER (SITTING IN FRONT OF CONTROLLERS) IP ADDRESS
+
 #####################################################  KUBERNETES CA   #############################################
 
 cat > ca-config.json <<EOF
@@ -20,22 +34,23 @@ cat > ca-csr.json <<EOF
 {
   "CN": "Kubernetes",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "Kubernetes",
-      "OU": "CA",
-      "ST": "Ontario"
+      "OU": "${ORG}",
+      "ST": "${STATE}"
     }
   ]
 }
 EOF
 
 /usr/local/bin/cfssl gencert -initca ca-csr.json | /usr/local/bin/cfssljson -bare ca
+
 
 #################################################################################################################
 
@@ -46,16 +61,16 @@ cat > admin-csr.json <<EOF
 {
   "CN": "admin",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "system:masters",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -68,43 +83,41 @@ EOF
   -profile=kubernetes \
   admin-csr.json | /usr/local/bin/cfssljson -bare admin
 
+
 #################################################################################################################
 
 
 ##################################################  WORKER INSTANCES #################################################
-
-EXTERNAL_IP=(52.138.19.72 52.237.12.227 40.85.228.40)
 
 for instance in {1..3}; do
 cat > worker-${instance}-csr.json <<EOF
 {
   "CN": "system:node:worker-${instance}",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "system:nodes",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
 EOF
 
-
-
 /usr/local/bin/cfssl gencert \
   -ca=ca.pem \
   -ca-key=ca-key.pem \
   -config=ca-config.json \
-  -hostname=worker-${instance},${EXTERNAL_IP[${instance}-1]},10.0.0.2${instance} \
+  -hostname=worker-${instance},${WORKER_EXTERNAL_IP[${instance}-1]},10.0.0.2${instance} \
   -profile=kubernetes \
   worker-${instance}-csr.json | /usr/local/bin/cfssljson -bare worker-${instance}
 done
+
 
 #################################################################################################################
 
@@ -115,16 +128,16 @@ cat > kube-controller-manager-csr.json <<EOF
 {
   "CN": "system:kube-controller-manager",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "system:kube-controller-manager",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -137,8 +150,8 @@ EOF
   -profile=kubernetes \
   kube-controller-manager-csr.json | /usr/local/bin/cfssljson -bare kube-controller-manager
 
-#################################################################################################################
 
+#################################################################################################################
 
 
 ############################################### KUBE PROXY FILE   ##########################################
@@ -147,16 +160,16 @@ cat > kube-proxy-csr.json <<EOF
 {
   "CN": "system:kube-proxy",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "system:node-proxier",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -169,6 +182,7 @@ EOF
   -profile=kubernetes \
   kube-proxy-csr.json | /usr/local/bin/cfssljson -bare kube-proxy
 
+
 #################################################################################################################
 
 
@@ -178,16 +192,16 @@ cat > kube-scheduler-csr.json <<EOF
 {
   "CN": "system:kube-scheduler",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "system:kube-scheduler",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -207,24 +221,22 @@ EOF
 
 ############################################# API SERVER FILE  ##############################################
 
-KUBERNETES_PUBLIC_ADDRESS=20.39.141.250
-
 KUBERNETES_HOSTNAMES=kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local
 
 cat > kubernetes-csr.json <<EOF
 {
   "CN": "kubernetes",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "Kubernetes",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -237,6 +249,8 @@ EOF
   -hostname=10.32.0.1,10.0.0.11,10.0.0.12,10.0.0.13,${KUBERNETES_PUBLIC_ADDRESS},127.0.0.1,${KUBERNETES_HOSTNAMES} \
   -profile=kubernetes \
   kubernetes-csr.json | /usr/local/bin/cfssljson -bare kubernetes
+
+
 #################################################################################################################
 
 
@@ -247,16 +261,16 @@ cat > service-account-csr.json <<EOF
 {
   "CN": "service-accounts",
   "key": {
-    "algo": "rsa",
-    "size": 2048
+    "algo": "${KEY_ALGO}",
+    "size": ${KEY_SIZE}
   },
   "names": [
     {
-      "C": "CA",
-      "L": "Waterloo",
+      "C": "${COUNTRY_CODE}",
+      "L": "${LOCATION}",
       "O": "Kubernetes",
-      "OU": "Kubernetes The Hard Way",
-      "ST": "Ontario"
+      "OU": "${ORG_UNIT}",
+      "ST": "${STATE}"
     }
   ]
 }
@@ -268,5 +282,6 @@ EOF
   -config=ca-config.json \
   -profile=kubernetes \
   service-account-csr.json | /usr/local/bin/cfssljson -bare service-account
+
 
 #################################################################################################################

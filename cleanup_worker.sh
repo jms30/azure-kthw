@@ -20,4 +20,4 @@ sudo rm -r -f /usr/local/bin/kubectl
 sudo rm -r -f /usr/local/bin/kube-proxy
 sudo rm -r -f /usr/local/bin/kubelet
 
-echo -e "Cleaned Up everything on Master"
+echo -e "Cleaned Up on Worker -> Done."

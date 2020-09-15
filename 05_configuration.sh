@@ -1,10 +1,18 @@
+#!/usr/bin/env bash
+
+##################################### PARAMETERS #############################################
+
+KUBERNETES_PUBLIC_ADDRESS=8.8.8.8               ###ADD IP ADDRESS OF YOUR AZURE LOAD BALANCER HERE 
+WORKER_HOSTNAMES=(worker-1 worker-2 worker-3)
+CLUSTER_NAME="kubernetes-the-hard-way"
+
+###################################################################################################
+
 
 #################################################### WORKER KUBELET CONFIG  #######################################
 
-KUBERNETES_PUBLIC_ADDRESS=###ADD IP ADDRESS OF YOUR AZURE LOAD BALANCER HERE 
-
-for instance in worker-1 worker-2 worker-3; do
-  /usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+for instance in ${WORKER_HOSTNAMES[@]}; do
+  /usr/local/bin/kubectl config set-cluster $CLUSTER_NAME \
     --certificate-authority=ca.pem \
     --embed-certs=true \
     --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \
@@ -17,7 +25,7 @@ for instance in worker-1 worker-2 worker-3; do
     --kubeconfig=${instance}.kubeconfig
 
   /usr/local/bin/kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
+    --cluster=$CLUSTER_NAME \
     --user=system:node:${instance} \
     --kubeconfig=${instance}.kubeconfig
 
@@ -30,7 +38,7 @@ done
 
 #################################################  KUBE PROXY KUBECONFIG  ##############################################
 
-/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster $CLUSTER_NAME \
   --certificate-authority=ca.pem \
   --embed-certs=true \
   --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \
@@ -41,7 +49,7 @@ done
   --embed-certs=true \
   --kubeconfig=kube-proxy.kubeconfig
 /usr/local/bin/kubectl config set-context default \
-  --cluster=kubernetes-the-hard-way \
+  --cluster=$CLUSTER_NAME \
   --user=kube-proxy \
   --kubeconfig=kube-proxy.kubeconfig
 /usr/local/bin/kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
@@ -53,7 +61,7 @@ done
 
 ################################################# KUBE CONTROLLER MANAGER  ##########################################
 
-/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster $CLUSTER_NAME \
     --certificate-authority=ca.pem \
     --embed-certs=true \
     --server=https://127.0.0.1:6443 \
@@ -66,7 +74,7 @@ done
     --kubeconfig=kube-controller-manager.kubeconfig
 
 /usr/local/bin/kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
+    --cluster=$CLUSTER_NAME \
     --user=system:kube-controller-manager \
     --kubeconfig=kube-controller-manager.kubeconfig
 
@@ -78,7 +86,7 @@ done
 
 #################################### KUBE SCHEDULER KUBECONFIG ######################################################
 
-/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster $CLUSTER_NAME \
     --certificate-authority=ca.pem \
     --embed-certs=true \
     --server=https://127.0.0.1:6443 \
@@ -91,7 +99,7 @@ done
     --kubeconfig=kube-scheduler.kubeconfig
 
 /usr/local/bin/kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
+    --cluster=$CLUSTER_NAME \
     --user=system:kube-scheduler \
     --kubeconfig=kube-scheduler.kubeconfig
 
@@ -103,7 +111,7 @@ done
 
 ###################################  KUBE ADMIN KUBECONFIG ###############################################################
 
-/usr/local/bin/kubectl config set-cluster kubernetes-the-hard-way \
+/usr/local/bin/kubectl config set-cluster $CLUSTER_NAME \
     --certificate-authority=ca.pem \
     --embed-certs=true \
     --server=https://127.0.0.1:6443 \
@@ -116,12 +124,11 @@ done
     --kubeconfig=admin.kubeconfig
 
 /usr/local/bin/kubectl config set-context default \
-    --cluster=kubernetes-the-hard-way \
+    --cluster=$CLUSTER_NAME \
     --user=admin \
     --kubeconfig=admin.kubeconfig
 
 /usr/local/bin/kubectl config use-context default --kubeconfig=admin.kubeconfig
-
 
 #################################################################################################################
 

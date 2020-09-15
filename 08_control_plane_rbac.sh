@@ -21,7 +21,6 @@ rules:
 EOF
 
 
-
 cat <<EOF | kubectl apply -f -
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
